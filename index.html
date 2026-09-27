@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Theory Studio Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="brand">
+            <div class="logo">⬡</div>
+            <h2>Graph Studio <span>Pro</span></h2>
+        </div>
+
+        <div class="stats-badge">
+            <span>Đỉnh: <strong id="vertex-count">0</strong></span>
+            <span class="divider">|</span>
+            <span>Cạnh: <strong id="edge-count">0</strong></span>
+        </div>
+
+        <div class="header-actions">
+            <select id="preset-select" class="custom-select">
+                <option value="" disabled selected>📂 Chọn đồ thị mẫu...</option>
+                <option value="dijkstra">📍 Mẫu Dijkstra (Đề thi TRR)</option>
+                <option value="prim">🌲 Mẫu Cây khung Prim</option>
+                <option value="euler">✉️ Mẫu Đồ thị Euler</option>
+                <option value="hamilton">⚡ Mẫu Đồ thị Hamilton</option>
+            </select>
+            <button id="btn-clear" class="btn btn-secondary">🧹 Xóa tất cả</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Canvas Area -->
+        <div class="canvas-container">
+            <div class="floating-toolbar">
+                <button class="tool-btn active" data-tool="select" title="👆 Chọn & Di chuyển (Bấm giữ kéo đỉnh)">👆</button>
+                <button class="tool-btn" data-tool="add-node" title="➕ Thêm đỉnh (Click vào vị trí trống)">➕</button>
+                <button class="tool-btn" data-tool="add-edge" title="➖ Nối cạnh (Click đỉnh 1 rồi click đỉnh 2)">➖</button>
+                <button class="tool-btn" data-tool="erase" title="❌ Xóa (Click vào đỉnh/cạnh để xóa)">❌</button>
+            </div>
+
+            <canvas id="graph-canvas"></canvas>
+
+            <div class="canvas-hint">
+                <span id="hint-text">💡 Mẹo: Nhấp đúp (Double click) vào cạnh để đổi trọng số.</span>
+            </div>
+        </div>
+
+        <!-- Sidebar bên phải -->
+        <aside class="sidebar">
+            <nav class="algo-tabs">
+                <button class="tab-btn active" data-tab="dijkstra">📍 Dijkstra</button>
+                <button class="tab-btn" data-tab="prim">🌲 Prim</button>
+                <button class="tab-btn" data-tab="euler">✉️ Euler</button>
+                <button class="tab-btn" data-tab="hamilton">⚡ Hamilton</button>
+                <button class="tab-btn" data-tab="matrix">🔢 Ma trận</button>
+            </nav>
+
+            <div class="tab-content">
+                <!-- Panel Dijkstra -->
+                <div class="tab-panel active" id="panel-dijkstra">
+                    <div class="panel-card">
+                        <h3>📍 Đường đi ngắn nhất (Dijkstra)</h3>
+                        <p class="description">Tìm đường đi có tổng trọng số nhỏ nhất giữa 2 đỉnh.</p>
+                        <div class="selectors-row">
+                            <label>Đỉnh đầu: <select id="dijkstra-start" class="custom-select"></select></label>
+                            <label>Đỉnh đích: <select id="dijkstra-end" class="custom-select"></select></label>
+                        </div>
+                        <button id="btn-run-dijkstra" class="btn btn-primary btn-block">Chạy Dijkstra</button>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="result-box" id="dijkstra-result">Chưa thực thi</div>
+                        <h3>📊 Bảng các bước lặp TRR</h3>
+                        <div class="table-container">
+                            <table class="data-table" id="dijkstra-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bước</th>
+                                        <th>Đỉnh chọn</th>
+                                        <th>Nhãn các đỉnh [d, p]</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Prim -->
+                <div class="tab-panel" id="panel-prim">
+                    <div class="panel-card">
+                        <h3>🌲 Cây khung nhỏ nhất (Prim)</h3>
+                        <p class="description">Tìm cây khung phủ tất cả các đỉnh với tổng trọng số nhỏ nhất.</p>
+                        <label>Đỉnh bắt đầu: <select id="prim-start" class="custom-select"></select></label>
+                        <button id="btn-run-prim" class="btn btn-primary btn-block">Chạy Prim</button>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="result-box" id="prim-result">Chưa thực thi</div>
+                        <h3>📊 Bảng chọn cạnh cắt</h3>
+                        <div class="table-container">
+                            <table class="data-table" id="prim-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bước</th>
+                                        <th>Tập U</th>
+                                        <th>Cạnh chọn</th>
+                                        <th>Trọng số</th>
+                                        <th>Tổng W</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Euler -->
+                <div class="tab-panel" id="panel-euler">
+                    <div class="panel-card">
+                        <h3>✉️ Chu trình / Đường đi Euler</h3>
+                        <p class="description">Kiểm tra định lý Euler & thuật toán Hierholzer.</p>
+                        <button id="btn-run-euler" class="btn btn-primary btn-block">Xét tính chất Euler</button>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="result-box" id="euler-result">Chưa thực thi</div>
+                        <div id="euler-degree-info" class="info-block"></div>
+                    </div>
+                </div>
+
+                <!-- Panel Hamilton -->
+                <div class="tab-panel" id="panel-hamilton">
+                    <div class="panel-card">
+                        <h3>⚡ Chu trình / Đường đi Hamilton</h3>
+                        <p class="description">Kiểm tra định lý Dirac, Ore và Thuật toán Quay lui.</p>
+                        <button id="btn-run-hamilton" class="btn btn-primary btn-block">Xét tính chất Hamilton</button>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="result-box" id="hamilton-result">Chưa thực thi</div>
+                        <div id="hamilton-theorem-info" class="info-block"></div>
+                    </div>
+                </div>
+
+                <!-- Panel Ma trận -->
+                <div class="tab-panel" id="panel-matrix">
+                    <div class="panel-card">
+                        <h3>Ma trận kề (Adjacency Matrix)</h3>
+                        <pre id="adj-matrix-output" class="code-box"></pre>
+                    </div>
+                    <div class="panel-card">
+                        <h3>Ma trận trọng số (Weight Matrix)</h3>
+                        <pre id="weight-matrix-output" class="code-box"></pre>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- JS Module kết nối chính -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
